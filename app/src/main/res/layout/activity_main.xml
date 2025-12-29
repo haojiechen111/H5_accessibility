@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.best.h5bydcs.CustomWebView
+        android:id="@+id/accessibility_custom_Web"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="vertical"
+        android:importantForAccessibility="yes"
+        android:contentDescription="内容展示区域" />
+
+</RelativeLayout>

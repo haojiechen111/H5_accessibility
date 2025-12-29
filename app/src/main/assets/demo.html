@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>vVoiceBadge 指令测试页面 - 可见即可说</title>
+    <style>
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
+            'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          padding: 40px 20px;
+          min-height: 100vh;
+        }
+
+        .container {
+          max-width: 1200px;
+          margin: 0 auto;
+        }
+
+        .header {
+          text-align: center;
+          color: white;
+          margin-bottom: 40px;
+        }
+
+        .header h1 {
+          font-size: 36px;
+          margin-bottom: 12px;
+          text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+          font-size: 16px;
+          opacity: 0.9;
+        }
+
+        .info-panel {
+          background: rgba(255, 255, 255, 0.95);
+          border-radius: 12px;
+          padding: 24px;
+          margin-bottom: 24px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-panel h2 {
+          color: #667eea;
+          font-size: 20px;
+          margin-bottom: 16px;
+          border-bottom: 2px solid #667eea;
+          padding-bottom: 8px;
+        }
+
+        .info-panel ul {
+          list-style: none;
+          padding-left: 0;
+        }
+
+        .info-panel li {
+          padding: 8px 0;
+          color: #333;
+          font-size: 14px;
+          line-height: 1.6;
+        }
+
+        .info-panel li strong {
+          color: #667eea;
+          font-weight: 600;
+        }
+
+        .info-panel code {
+          background: #f5f5f5;
+          padding: 2px 6px;
+          border-radius: 4px;
+          font-family: 'Courier New', monospace;
+          font-size: 13px;
+          color: #e74c3c;
+        }
+
+        .song-list {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+          gap: 20px;
+          margin-bottom: 40px;
+        }
+
+        .song-card {
+          position: relative;
+          background: white;
+          border-radius: 12px;
+          padding: 20px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+          transition: all 0.3s ease;
+          cursor: pointer;
+          overflow: visible;
+        }
+
+        .song-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .song-card.voice-labeled {
+          border: 2px solid #667eea;
+        }
+
+        /* 角标样式 - 模拟 VoiceBadge 组件 */
+        .voice-badge {
+          position: absolute;
+          top: 0;
+          left: 0;
+          transform: translate(var(--offset-x, -12px), var(--offset-y, 0));
+          z-index: 10;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          min-width: 32px;
+          height: 32px;
+          border-radius: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 16px;
+          font-weight: 600;
+          padding: 0 10px;
+          box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+          pointer-events: none;
+        }
+
+        .song-info {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .song-name {
+          font-size: 18px;
+          font-weight: 600;
+          color: #333;
+          line-height: 1.4;
+        }
+
+        .song-singer {
+          font-size: 14px;
+          color: #666;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .song-singer svg {
+          width: 16px;
+          height: 16px;
+        }
+
+        .song-meta {
+          display: flex;
+          gap: 12px;
+          margin-top: 8px;
+        }
+
+        .song-tag {
+          background: #f0f0f0;
+          color: #666;
+          padding: 4px 12px;
+          border-radius: 4px;
+          font-size: 12px;
+        }
+
+        .song-tag.vip {
+          background: #ffe4cc;
+          color: #ff6b35;
+        }
+
+        .song-tag.hd {
+          background: #e0f2f1;
+          color: #00897b;
+        }
+
+        /* 语音控制数据显示 */
+        .voice-data-display {
+          margin-top: 12px;
+          padding: 12px;
+          background: #f8f9fa;
+          border-radius: 8px;
+          border-left: 3px solid #667eea;
+        }
+
+        .voice-data-display .label {
+          font-size: 12px;
+          color: #667eea;
+          font-weight: 600;
+          margin-bottom: 6px;
+        }
+
+        .voice-data-display .content {
+          font-family: 'Courier New', monospace;
+          font-size: 11px;
+          color: #333;
+          word-break: break-all;
+          line-height: 1.5;
+        }
+
+        /* 隐藏的语音控制数据（实际应用中是隐藏的） */
+        .sr-only {
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          padding: 0;
+          margin: -1px;
+          overflow: hidden;
+          clip: rect(0, 0, 0, 0);
+          white-space: nowrap;
+          border: 0;
+        }
+
+        /* 可见性指示器 */
+        .visibility-indicator {
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          background: white;
+          padding: 16px 20px;
+          border-radius: 12px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          z-index: 100;
+        }
+
+        .visibility-indicator h3 {
+          color: #667eea;
+          font-size: 14px;
+          margin-bottom: 8px;
+        }
+
+        .visibility-indicator p {
+          font-size: 12px;
+          color: #666;
+          margin: 4px 0;
+        }
+
+        .visibility-indicator .count {
+          color: #667eea;
+          font-weight: 600;
+        }
+
+        /* 高亮可见元素 */
+        .visible-highlight {
+          animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+          0%, 100% {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+          }
+          50% {
+            box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+          }
+        }
+
+        /* 测试按钮 */
+        .test-controls {
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          z-index: 100;
+        }
+
+        .test-btn {
+          background: white;
+          border: 2px solid #667eea;
+          color: #667eea;
+          padding: 10px 20px;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 14px;
+          font-weight: 600;
+          transition: all 0.3s ease;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .test-btn:hover {
+          background: #667eea;
+          color: white;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .test-btn:active {
+          transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>vVoiceBadge 指令测试页面</h1>
+        <p>模拟可见即可说功能 - 测试语音控制数据绑定逻辑</p>
+    </div>
+
+    <!-- 功能说明面板 -->
+    <div class="info-panel">
+        <h2>功能说明</h2>
+        <ul>
+            <li><strong>角标显示：</strong>每个歌曲卡片左上角显示序号角标（紫色渐变圆形）</li>
+            <li><strong>语音控制数据：</strong>隐藏的 span 元素包含 JSON 格式的语音控制数据</li>
+            <li><strong>数据格式：</strong><code>{"operate_type":"click","action_name":"play_index","contentDescription":"序号文本","view_id":""}</code>
+            </li>
+            <li><strong>增强识别：</strong>数字序号会转换为增强文本（如 "1" → "第一个"），存储在 <code>data-voice-text</code>
+                属性中
+            </li>
+            <li><strong>可见性检测：</strong>滚动页面时，右下角显示当前可见的卡片数量</li>
+            <li><strong>视觉反馈：</strong>带有 <code>.voice-labeled</code> 类的卡片有蓝色边框</li>
+        </ul>
+    </div>
+
+    <!-- 测试控制按钮 -->
+    <div class="test-controls">
+        <button class="test-btn" onclick="highlightVisibleCards()">高亮可见卡片</button>
+        <button class="test-btn" onclick="showVoiceData()">显示语音数据</button>
+        <button class="test-btn" onclick="scrollToTop()">回到顶部</button>
+    </div>
+
+    <!-- 歌曲列表 -->
+    <div class="song-list" id="songList">
+        <!-- 这里会动态生成歌曲卡片 -->
+    </div>
+
+    <!-- 可见性指示器 -->
+    <div class="visibility-indicator" id="visibilityIndicator">
+        <h3>可见性检测</h3>
+        <p>总卡片数: <span class="count" id="totalCount">0</span></p>
+        <p>可见卡片数: <span class="count" id="visibleCount">0</span></p>
+    </div>
+</div>
+
+<script>
+    window.TSVehicle?.setHomeBottomMargin?.(120)
+    window.TSBaseInfo?.notifyHomePageLoadCompleted?.();
+    window.TSBaseInfo?.notifyHomeDataLoadCompleted?.();
+    // 模拟歌曲数据
+    const songs = [
+      { id: 1, name: '告白气球', singer: '周杰伦', vip: false, hd: true },
+      { id: 2, name: '夜曲', singer: '周杰伦', vip: true, hd: true },
+      { id: 3, name: '晴天', singer: '周杰伦', vip: false, hd: false },
+      { id: 4, name: '稻香', singer: '周杰伦', vip: false, hd: true },
+      { id: 5, name: '七里香', singer: '周杰伦', vip: true, hd: true },
+      { id: 6, name: '演员', singer: '薛之谦', vip: false, hd: true },
+      { id: 7, name: '动物世界', singer: '薛之谦', vip: false, hd: false },
+      { id: 8, name: '刚刚好', singer: '薛之谦', vip: true, hd: true },
+      { id: 9, name: '认真的雪', singer: '薛之谦', vip: false, hd: true },
+      { id: 10, name: '丑八怪', singer: '薛之谦', vip: false, hd: false },
+      { id: 11, name: '默', singer: '那英', vip: true, hd: true },
+      { id: 12, name: '起风了', singer: '买辣椒也用券', vip: false, hd: true },
+      { id: 13, name: '大鱼', singer: '周深', vip: false, hd: true },
+      { id: 14, name: '光年之外', singer: '邓紫棋', vip: true, hd: true },
+      { id: 15, name: '体面', singer: '于文文', vip: false, hd: true },
+      { id: 16, name: '成都', singer: '赵雷', vip: false, hd: true },
+      { id: 17, name: '南山南', singer: '马頔', vip: true, hd: true },
+      { id: 18, name: '消愁', singer: '毛不易', vip: false, hd: false },
+      { id: 19, name: '像我这样的人', singer: '毛不易', vip: false, hd: true },
+      { id: 20, name: '理想三旬', singer: '陈鸿宇', vip: true, hd: true },
+      { id: 21, name: '红玫瑰', singer: '陈奕迅', vip: false, hd: true },
+      { id: 22, name: '十年', singer: '陈奕迅', vip: false, hd: false },
+      { id: 23, name: '浮夸', singer: '陈奕迅', vip: true, hd: true },
+      { id: 24, name: '富士山下', singer: '陈奕迅', vip: false, hd: true },
+      { id: 25, name: '孤勇者', singer: '陈奕迅', vip: false, hd: false },
+      { id: 26, name: '后来', singer: '刘若英', vip: true, hd: true },
+      { id: 27, name: '匆匆那年', singer: '王菲', vip: false, hd: true },
+      { id: 28, name: '她来听我的演唱会', singer: '张学友', vip: false, hd: true },
+      { id: 29, name: '遥远的她', singer: '张学友', vip: true, hd: true },
+      { id: 30, name: '你的背包', singer: '陈奕迅', vip: false, hd: true }
+    ];
+
+    // 数字转语音增强文本（简化版）
+    function numberToVoiceTextFull(num) {
+      const numberMap = {
+        '0': '第零个', '1': '第一个', '2': '第二个', '3': '第三个', '4': '第四个',
+        '5': '第五个', '6': '第六个', '7': '第七个', '8': '第八个', '9': '第九个',
+        '10': '第十个', '11': '第十一个', '12': '第十二个', '13': '第十三个', '14': '第十四个',
+        '15': '第十五个', '16': '第十六个', '17': '第十七个', '18': '第十八个', '19': '第十九个',
+        '20': '第二十个', '21': '第二十一个', '22': '第二十二个', '23': '第二十三个', '24': '第二十四个',
+        '25': '第二十五个', '26': '第二十六个', '27': '第二十七个', '28': '第二十八个', '29': '第二十九个',
+        '30': '第三十个',
+      };
+      return numberMap[String(num)] || `第${num}个`;
+    }
+
+    // 创建歌曲卡片
+    function createSongCard(song, index) {
+      const card = document.createElement('div');
+      card.className = 'song-card voice-labeled';
+      card.dataset.songId = song.id;
+
+      // 语音控制数据
+      const voiceText = numberToVoiceTextFull(index + 1);
+      const indexVoiceData = {
+        operate_type: 'click',
+        action_name: 'play_index',
+        contentDescription: String(index + 1),
+        view_id: `index_${index + 1}`,
+      };
+
+      // 创建角标容器
+      const badgeContainer = document.createElement('div');
+      badgeContainer.className = 'voice-badge';
+      badgeContainer.style.setProperty('--offset-x', '-12px');
+      badgeContainer.style.setProperty('--offset-y', '0');
+      
+      // 可见的角标文本（使用aria-hidden）
+      const badgeText = document.createElement('span');
+      badgeText.setAttribute('aria-hidden', 'true');
+      badgeText.textContent = index + 1;
+      
+      badgeContainer.appendChild(badgeText);
+      
+      // 序号的无障碍数据（放在卡片根元素上，不在badge内部）
+      const indexVoiceDataSpan = document.createElement('span');
+      indexVoiceDataSpan.className = 'sr-only';
+      indexVoiceDataSpan.textContent = JSON.stringify(indexVoiceData);
+
+      // 创建歌曲名称（带无障碍标注）
+      const songNameContainer = document.createElement('div');
+      songNameContainer.className = 'song-name';
+      
+      const songNameText = document.createElement('span');
+      songNameText.setAttribute('aria-hidden', 'true');
+      songNameText.textContent = song.name;
+      
+      const songNameVoiceData = document.createElement('span');
+      songNameVoiceData.className = 'sr-only';
+      songNameVoiceData.textContent = JSON.stringify({
+        operate_type: 'click',
+        action_name: 'action_general_label',
+        contentDescription: song.name,
+        view_id: `song_name_${song.id}`,
+      });
+      
+      songNameContainer.appendChild(songNameText);
+      songNameContainer.appendChild(songNameVoiceData);
+
+      // 创建歌手信息（带无障碍标注）
+      const singerContainer = document.createElement('div');
+      singerContainer.className = 'song-singer';
+      
+      const singerIcon = document.createElement('svg');
+      singerIcon.setAttribute('viewBox', '0 0 24 24');
+      singerIcon.setAttribute('fill', 'currentColor');
+      singerIcon.innerHTML = '<path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>';
+      
+      const singerText = document.createElement('span');
+      singerText.setAttribute('aria-hidden', 'true');
+      singerText.textContent = song.singer;
+      
+      const singerVoiceData = document.createElement('span');
+      singerVoiceData.className = 'sr-only';
+      singerVoiceData.textContent = JSON.stringify({
+        operate_type: 'click',
+        action_name: 'action_general_label',
+        contentDescription: song.singer,
+        view_id: `song_singer_${song.id}`,
+      });
+      
+      singerContainer.appendChild(singerIcon);
+      singerContainer.appendChild(singerText);
+      singerContainer.appendChild(singerVoiceData);
+
+      // 创建标签容器
+      const metaContainer = document.createElement('div');
+      metaContainer.className = 'song-meta';
+      
+      // VIP/限免标签
+      const vipTag = document.createElement('span');
+      vipTag.className = song.vip ? 'song-tag vip' : 'song-tag';
+      const vipText = song.vip ? 'VIP' : '限免';
+      
+      const vipTagText = document.createElement('span');
+      vipTagText.setAttribute('aria-hidden', 'true');
+      vipTagText.textContent = vipText;
+      
+      const vipTagVoiceData = document.createElement('span');
+      vipTagVoiceData.className = 'sr-only';
+      vipTagVoiceData.textContent = JSON.stringify({
+        operate_type: 'disable',
+      });
+      
+      vipTag.appendChild(vipTagText);
+      vipTag.appendChild(vipTagVoiceData);
+      metaContainer.appendChild(vipTag);
+      
+      // HD标签
+      if (song.hd) {
+        const hdTag = document.createElement('span');
+        hdTag.className = 'song-tag hd';
+        
+        const hdTagText = document.createElement('span');
+        hdTagText.setAttribute('aria-hidden', 'true');
+        hdTagText.textContent = '1080P';
+        
+        const hdTagVoiceData = document.createElement('span');
+        hdTagVoiceData.className = 'sr-only';
+        hdTagVoiceData.textContent = JSON.stringify({
+          operate_type: 'disable',
+        });
+        
+        hdTag.appendChild(hdTagText);
+        hdTag.appendChild(hdTagVoiceData);
+        metaContainer.appendChild(hdTag);
+      }
+
+      // 创建调试信息显示区域
+      const debugDisplay = document.createElement('div');
+      debugDisplay.className = 'voice-data-display';
+      debugDisplay.style.display = 'none';
+      debugDisplay.innerHTML = `
+        <div class="label">角标无障碍数据 (play_index):</div>
+        <div class="content">${JSON.stringify(indexVoiceData, null, 2)}</div>
+        <div class="label" style="margin-top: 8px;">歌曲名无障碍数据 (action_general_label):</div>
+        <div class="content">${JSON.stringify({
+          operate_type: 'click',
+          action_name: 'action_general_label',
+          contentDescription: song.name,
+          view_id: `song_name_${song.id}`,
+        }, null, 2)}</div>
+        <div class="label" style="margin-top: 8px;">增强识别文本:</div>
+        <div class="content">"${voiceText}"</div>
+      `;
+
+      // 创建歌曲信息容器
+      const songInfo = document.createElement('div');
+      songInfo.className = 'song-info';
+      songInfo.appendChild(songNameContainer);
+      songInfo.appendChild(singerContainer);
+      songInfo.appendChild(metaContainer);
+      songInfo.appendChild(debugDisplay);
+
+      // 组装卡片（序号无障碍数据直接添加到card根元素）
+      card.appendChild(indexVoiceDataSpan);
+      card.appendChild(badgeContainer);
+      card.appendChild(songInfo);
+
+      // 点击事件
+      card.addEventListener('click', () => {
+        alert(`点击了: ${song.name}\n语音文本: ${voiceText}\n原始序号: ${index + 1}`);
+      });
+
+      return card;
+    }
+
+    // 渲染歌曲列表
+    function renderSongList() {
+      const songList = document.getElementById('songList');
+      songList.innerHTML = '';
+
+      songs.forEach((song, index) => {
+        const card = createSongCard(song, index);
+        songList.appendChild(card);
+      });
+
+      updateCounts();
+    }
+
+    // 更新计数器
+    function updateCounts() {
+      const totalCount = document.getElementById('totalCount');
+      const visibleCount = document.getElementById('visibleCount');
+
+      const cards = document.querySelectorAll('.song-card');
+      totalCount.textContent = cards.length;
+
+      // 计算可见卡片数量
+      let visible = 0;
+      cards.forEach(card => {
+        const rect = card.getBoundingClientRect();
+        if (rect.top < window.innerHeight && rect.bottom > 0) {
+          visible++;
+        }
+      });
+
+      visibleCount.textContent = visible;
+    }
+
+    // 高亮可见卡片
+    function highlightVisibleCards() {
+      const cards = document.querySelectorAll('.song-card');
+      cards.forEach(card => {
+        card.classList.remove('visible-highlight');
+
+        const rect = card.getBoundingClientRect();
+        if (rect.top < window.innerHeight && rect.bottom > 0) {
+          card.classList.add('visible-highlight');
+        }
+      });
+
+      setTimeout(() => {
+        cards.forEach(card => {
+          card.classList.remove('visible-highlight');
+        });
+      }, 3000);
+    }
+
+    // 显示/隐藏语音数据
+    let showingVoiceData = false;
+    function showVoiceData() {
+      showingVoiceData = !showingVoiceData;
+      const displays = document.querySelectorAll('.voice-data-display');
+      displays.forEach(display => {
+        display.style.display = showingVoiceData ? 'block' : 'none';
+      });
+
+      event.target.textContent = showingVoiceData ? '隐藏语音数据' : '显示语音数据';
+    }
+
+    // 滚动到顶部
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // 监听滚动事件，更新可见性计数
+    let scrollTimer;
+    window.addEventListener('scroll', () => {
+      clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(updateCounts, 100);
+    });
+
+    // 监听窗口大小变化
+    window.addEventListener('resize', updateCounts);
+
+    // 初始化
+    renderSongList();
+
+    // 控制台输出测试信息
+    console.log('=== vVoiceBadge 指令测试页面已加载 ===');
+    console.log('总歌曲数:', songs.length);
+    console.log('语音控制数据格式示例:');
+    console.log(JSON.stringify({
+      operate_type: 'click',
+      action_name: 'play_index',
+      contentDescription: '1',
+      view_id: '',
+    }, null, 2));
+    console.log('');
+    console.log('增强识别文本示例:');
+    console.log('原始: "1" → 增强: "第一个"');
+    console.log('原始: "5" → 增强: "第五个"');
+    console.log('');
+    console.log('测试方法:');
+    console.log('1. 滚动页面查看可见性检测');
+    console.log('2. 点击"高亮可见卡片"按钮');
+    console.log('3. 点击"显示语音数据"查看 JSON');
+    console.log('4. 点击歌曲卡片触发点击事件');
+    console.log('5. 使用浏览器开发者工具检查 DOM 结构');
+</script>
+</body>
+</html>

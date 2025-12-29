@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>探索世界之美</title>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* 导航栏样式 */
+        header {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo i {
+            margin-right: 10px;
+            font-size: 28px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 30px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #ffdd40;
+        }
+
+        /* 英雄区域样式 */
+        .hero {
+            background: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80') no-repeat center center/cover;
+            height: 500px;
+            display: flex;
+            align-items: center;
+            color: white;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .hero p {
+            font-size: 20px;
+            margin-bottom: 30px;
+        }
+
+        /* 按钮样式 */
+        .btn {
+            display: inline-block;
+            background: #ff6b6b;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .btn:hover {
+            background: #ff5252;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+        }
+
+        /* 内容区域样式 */
+        .section-title {
+            text-align: center;
+            margin: 60px 0 40px;
+            font-size: 36px;
+            color: #2d3436;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            margin: 15px auto;
+            border-radius: 2px;
+        }
+
+        /* 卡片布局 */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-img {
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .card-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .card:hover .card-img img {
+            transform: scale(1.1);
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .card h3 {
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: #2d3436;
+        }
+
+        .card p {
+            color: #636e72;
+            margin-bottom: 20px;
+        }
+
+        .card-btn {
+            display: inline-block;
+            color: #6a11cb;
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .card-btn:hover {
+            color: #2575fc;
+        }
+
+        /* 特性区域样式 */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .feature {
+            text-align: center;
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .feature:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature i {
+            font-size: 40px;
+            color: #6a11cb;
+            margin-bottom: 20px;
+        }
+
+        .feature h3 {
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: #2d3436;
+        }
+
+        /* 页脚样式 */
+        footer {
+            background: #2d3436;
+            color: white;
+            padding: 60px 0 30px;
+            text-align: center;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section h3 {
+            font-size: 22px;
+            margin-bottom: 20px;
+            color: #ffdd40;
+        }
+
+        .social-links a {
+            display: inline-block;
+            margin: 0 10px;
+            color: white;
+            font-size: 20px;
+            transition: color 0.3s ease;
+        }
+
+        .social-links a:hover {
+            color: #ffdd40;
+        }
+
+        .copyright {
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* 无障碍样式 */
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 36px;
+            }
+
+            .hero p {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- 导航栏 -->
+<header>
+    <div class="container">
+        <nav>
+            <div class="logo" role="banner" title="探索世界">
+                <i class="fas fa-globe-americas" aria-hidden="true"></i>
+                <span aria-hidden="true">探索世界</span>
+            </div>
+            <ul class="nav-links">
+                <li>
+                    <a href="#">
+                        <!-- 外层的可访问描述，这个 span 被无障碍读取到，就是外层的文字 -->
+                        <span style="position:absolute;left:-9999px;">首页</span>
+                        <!-- 内层视觉文字，aria-hidden 保证无障碍不读 -->
+                        <span aria-hidden="true">首页</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <span style="position:absolute;left:-9999px;">目的地</span>
+                        <span aria-hidden="true">目的地</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <span style="position:absolute;left:-9999px;">旅行指南</span>
+                        <span aria-hidden="true">旅行指南</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <span style="position:absolute;left:-9999px;">关于我们</span>
+                        <span aria-hidden="true">关于我们</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <span style="position:absolute;left:-9999px;">联系我们</span>
+                        <span aria-hidden="true">联系我们</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<!-- 英雄区域 -->
+<section class="hero">
+    <div class="hero-content">
+        <h1>发现世界的奇迹</h1>
+        <p>探索世界上最令人惊叹的地方，体验不同文化，创造难忘的回忆</p>
+        <a href="#" class="btn">开始探索</a>
+    </div>
+</section>
+
+<!-- 热门目的地 -->
+<section class="container">
+    <h2 class="section-title">热门目的地</h2>
+    <div class="cards">
+        <div class="card">
+            <div class="card-img" data="巴厘岛" title="巴厘岛" aria-label="巴厘岛">
+                <span class="visually-hidden">巴厘岛</span>
+                <img src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
+                     alt="巴厘岛海滩和火山风景">
+            </div>
+            <div class="card-content">
+                <h3>巴厘岛，印度尼西亚</h3>
+                <p>拥有美丽的海滩、火山和郁郁葱葱的稻田，是度假和放松的完美之地。</p>
+                <a href="#" class="card-btn">了解更多 <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-img">
+                <!--                <span class="visually-hidden">圣托里尼白色建筑和蓝色圆顶教堂</span>-->
+                <img src="https://images.unsplash.com/photo-1539650116574-75c0c6d73d6a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
+                     alt="圣托里尼白色建筑和蓝色圆顶教堂">
+            </div>
+            <div class="card-content">
+                <h3>圣托里尼，希腊</h3>
+                <p>白色的建筑、蓝色的圆顶教堂和令人惊叹的爱琴海景色，是浪漫之旅的理想选择。</p>
+                <a href="#" class="card-btn">了解更多 <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-img" role="img" tabindex="0"
+                 title="神父">
+                <img src="https://images.unsplash.com/photo-1543785734-4b6e564642f8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
+                     alt="东京城市天际线和传统建筑">
+            </div>
+            <div class="card-content">
+                <h3>东京，日本</h3>
+                <p>传统与现代的完美融合，从古老的寺庙到高科技的街区，提供独特的文化体验。</p>
+                <a href="#" class="card-btn">了解更多 <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 我们的服务 -->
+<section class="container">
+    <h2 class="section-title">我们的服务</h2>
+    <div class="features">
+        <div class="feature">
+            <i class="fas fa-route"></i>
+            <h3>个性化行程</h3>
+            <p>根据您的兴趣和偏好定制专属旅行路线</p>
+        </div>
+
+        <div class="feature">
+            <i class="fas fa-hotel"></i>
+            <h3>精品住宿</h3>
+            <p>精心挑选的高品质住宿，确保您的舒适体验</p>
+        </div>
+
+        <div class="feature">
+            <i class="fas fa-user-shield"></i>
+            <h3>旅行保障</h3>
+            <p>全面的保险和24/7支持，让您安心旅行</p>
+        </div>
+
+        <div class="feature">
+            <i class="fas fa-tags"></i>
+            <h3>最优价格</h3>
+            <p> 保证提供市场上最具竞争力的价格</p>
+        </div>
+    </div>
+</section>
+
+<!-- 页脚 -->
+<footer>
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>关于我们</h3>
+                <p>我们致力于为客户提供最难忘的旅行体验，让每一次旅行都成为一生中的珍贵回忆。</p>
+            </div>
+
+            <div class="footer-section">
+                <h3>联系我们</h3>
+                <p>电话: +86 123 4567 8900</p>
+                <p>邮箱: info@exploreworld.com</p>
+                <p>地址: 北京市朝阳区探索大厦</p>
+            </div>
+
+            <div class="footer-section">
+                <h3>关注我们</h3>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-weibo"></i></a>
+                    <a href="#"><i class="fab fa-weixin"></i></a>
+                    <a href="#"><i class="fab fa-qq"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="copyright">
+            <p>&copy; 2023 探索世界旅行. 保留所有权利</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // 图片URL映射配置
+    const imageMap = {
+        'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4': '实际URL1',
+        'https://images.unsplash.com/photo-1539650116574-75c0c6d73d6a': '实际URL2',
+        'https://images.unsplash.com/photo-1543785734-4b6e564642f8': '实际URL3'
+    };
+
+    // 图片URL映射函数
+    function mapImageSrc() {
+        const images = document.querySelectorAll('img');
+        images.forEach(img => {
+            const originalSrc = img.src;
+            if (imageMap[originalSrc]) {
+                // 保持显示原URL，实际请求映射URL
+                img.dataset.originalSrc = originalSrc;
+                img.src = imageMap[originalSrc];
+            }
+        });
+    }
+
+    // 简单的交互效果
+    document.addEventListener('DOMContentLoaded', function() {
+        // 执行图片映射
+        mapImageSrc();
+        // 增强图片无障碍支持
+        const images = document.querySelectorAll('img');
+        images.forEach(img => {
+            // 确保所有图片都有alt属性
+            if (!img.hasAttribute('alt')) {
+                img.setAttribute('alt', '旅行目的地图片');
+            }
+
+            // 添加详细的ARIA描述
+            const altText = img.getAttribute('alt');
+            img.setAttribute('aria-label', '旅行图片: ' + altText);
+            img.setAttribute('role', 'img');
+
+            // 为背景图片添加描述
+            if (img.parentElement.classList.contains('hero')) {
+                img.setAttribute('aria-hidden', 'true');
+            }
+        });
+
+        // 为按钮添加点击事件
+        const buttons = document.querySelectorAll('.btn, .card-btn');
+        buttons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('感谢您的点击！这将引导到更多详情页面。');
+            });
+        });
+
+        // 为所有h2标题添加点击事件
+        const headings = document.querySelectorAll('h2');
+        headings.forEach(heading => {
+            heading.style.cursor = 'pointer';
+            heading.addEventListener('click', function() {
+                alert('您点击了标题: ' + heading.textContent);
+            });
+        });
+
+        const headings = document.querySelectorAll('span');
+        headings.forEach(heading => {
+            heading.style.cursor = 'pointer';
+            heading.addEventListener('click', function() {
+                alert('您点击了标题: ' + heading.textContent);
+            });
+        });
+
+
+
+
+        // 导航栏滚动效果
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('header');
+            if (window.scrollY > 50) {
+                header.style.background = 'linear-gradient(135deg, #6a11cb 0%, #2575fc 100%)';
+                header.style.padding = '15px 0';
+            } else {
+                header.style.background = 'linear-gradient(135deg, #6a11cb 0%, #2575fc 100%)';
+                header.style.padding = '20px 0';
+            }
+        });
+    });
+</script>
+</body>
+</html>

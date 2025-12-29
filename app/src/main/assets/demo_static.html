@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>静态HTML无障碍标注示例</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
+        'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 40px 20px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      color: white;
+      margin-bottom: 40px;
+    }
+
+    .header h1 {
+      font-size: 36px;
+      margin-bottom: 12px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .header p {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+
+    .info-box {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .info-box h2 {
+      color: #667eea;
+      font-size: 20px;
+      margin-bottom: 16px;
+    }
+
+    .info-box code {
+      background: #f5f5f5;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      color: #e74c3c;
+    }
+
+    .song-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 20px;
+    }
+
+    .song-card {
+      position: relative;
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      border: 2px solid #667eea;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .song-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .song-card:focus {
+      border-color: #764ba2;
+      box-shadow: 0 0 0 3px rgba(118, 75, 162, 0.3);
+    }
+
+    .song-card:active {
+      transform: translateY(-2px);
+    }
+
+    /* 角标样式 */
+    .voice-badge {
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform: translate(-12px, 0);
+      z-index: 10;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      min-width: 32px;
+      height: 32px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 600;
+      padding: 0 10px;
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+      pointer-events: none;
+    }
+
+    .song-info {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* 歌名样式 */
+    .song-name {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+      line-height: 1.4;
+      pointer-events: none;
+    }
+
+    .song-singer {
+      font-size: 14px;
+      color: #666;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .song-singer svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* 歌手名样式 */
+    .song-singer .singer-name {
+      color: #666;
+      pointer-events: none;
+    }
+
+    .song-meta {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .song-tag {
+      background: #f0f0f0;
+      color: #666;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    .song-tag.vip {
+      background: #ffe4cc;
+      color: #ff6b35;
+    }
+
+    .song-tag.hd {
+      background: #e0f2f1;
+      color: #00897b;
+    }
+
+    /* 横向滑动列表样式 */
+    .quotes-section {
+      margin-bottom: 30px;
+    }
+
+    .quotes-title {
+      text-align: center;
+      color: white;
+      font-size: 20px;
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
+
+    .quotes-container {
+      display: flex;
+      overflow-x: auto;
+      overflow-y: hidden;
+      gap: 20px;
+      padding: 20px 10px;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.5) transparent;
+    }
+
+    .quotes-container::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    .quotes-container::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+    }
+
+    .quotes-container::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 10px;
+    }
+
+    .quotes-container::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    .quote-card {
+      min-width: 320px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      scroll-snap-align: start;
+      flex-shrink: 0;
+      border-left: 4px solid #667eea;
+      transition: transform 0.2s ease;
+    }
+
+    .quote-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .quote-text {
+      font-size: 16px;
+      line-height: 1.6;
+      color: #333;
+      margin-bottom: 15px;
+      font-style: italic;
+    }
+
+    .quote-author {
+      text-align: right;
+      color: #667eea;
+      font-weight: 600;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body aria-label='{"operate_type":"click","action_name":"slide_direction_vertical","contentDescription":"slide_direction_vertical","view_id":"com.best.h5bydcs:id/slide_direction_vertical"}' style="overflow-y: auto;">
+  <div class="container">
+    <div class="header">
+      <h1>静态HTML无障碍标注示例</h1>
+      <p>纯HTML标签方式 - 整卡片点击</p>
+    </div>
+
+    <!-- 横向滑动名人名言 -->
+    <div class="quotes-section">
+      <div class="quotes-title">每日名言</div>
+      <div class="quotes-container"
+           aria-label='{"operate_type":"click","action_name":"slide_direction_horizontal","contentDescription":"slide_direction_horizontal","view_id":"com.best.h5bydcs:id/slide_direction_horizontal"}'>
+        
+        <div class="quote-card">
+          <div class="quote-text">"成功不是终点，失败也不是末日，重要的是继续前进的勇气。"</div>
+          <div class="quote-author">— 温斯顿·丘吉尔</div>
+        </div>
+
+        <div class="quote-card">
+          <div class="quote-text">"生活就像骑自行车，要保持平衡就要不断前进。"</div>
+          <div class="quote-author">— 爱因斯坦</div>
+        </div>
+
+        <div class="quote-card">
+          <div class="quote-text">"你今天的努力，是幸运的伏笔；当下的付出，是明日的花开。"</div>
+          <div class="quote-author">— 佚名</div>
+        </div>
+
+        <div class="quote-card">
+          <div class="quote-text">"成功的秘诀在于坚持自己的目标和信念。"</div>
+          <div class="quote-author">— 富兰克林</div>
+        </div>
+
+        <div class="quote-card">
+          <div class="quote-text">"不要等待机会，而要创造机会。"</div>
+          <div class="quote-author">— 乔治·伯纳德·肖</div>
+        </div>
+
+        <div class="quote-card">
+          <div class="quote-text">"相信自己，你能做到的比你想象的要多得多。"</div>
+          <div class="quote-author">— 威廉·詹姆斯</div>
+        </div>
+
+        <div class="quote-card">
+          <div class="quote-text">"人生没有彩排，每一天都是现场直播。"</div>
+          <div class="quote-author">— 佚名</div>
+        </div>
+
+        <div class="quote-card">
+          <div class="quote-text">"只有在尝试的时候，才知道自己能够做什么。"</div>
+          <div class="quote-author">— 普布利利乌斯·西鲁斯</div>
+        </div>
+
+        <div class="quote-card">
+          <div class="quote-text">"成功是由日复一日的点滴努力汇聚而成的。"</div>
+          <div class="quote-author">— 罗伯特·科利尔</div>
+        </div>
+
+        <div class="quote-card">
+          <div class="quote-text">"人生最大的荣耀不在于永不跌倒，而在于每次跌倒后都能站起来。"</div>
+          <div class="quote-author">— 纳尔逊·曼德拉</div>
+        </div>
+
+        <div class="quote-card">
+          <div class="quote-text">"困难越大，荣耀也越大。"</div>
+          <div class="quote-author">— 西塞罗</div>
+        </div>
+
+        <div class="quote-card">
+          <div class="quote-text">"梦想不会逃跑，会逃跑的永远都是自己。"</div>
+          <div class="quote-author">— 佚名</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 说明面板 -->
+    <div class="info-box">
+      <h2>实现说明</h2>
+      <p style="margin-bottom: 12px; line-height: 1.6;">
+        此示例使用纯HTML属性设置无障碍数据,不依赖JavaScript。
+      </p>
+      <p style="line-height: 1.6;">
+        每个<strong>卡片</strong>作为一个独立的点击事件。
+        辅助服务可识别:<strong>角标</strong>用<code>action_general_index</code>，
+        <strong>歌名/歌手</strong>用<code>action_general_label</code>。
+      </p>
+    </div>
+
+    <!-- 歌曲列表 -->
+    <div class="song-list">
+      
+      <!-- 卡片1：告白气球 -->
+      <div class="song-card"
+           onclick="alert('点击了卡片: 告白气球')">
+        <div class="voice-badge"
+             aria-label='{"operate_type":"click","action_name":"action_general_index","contentDescription":"1","view_id":"badge_1"}'>
+          <span>1</span>
+        </div>
+        <div class="song-info">
+          <div class="song-name"
+               aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"告白气球","view_id":"song_name_1"}'>
+            告白气球
+          </div>
+          <div class="song-singer">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            <span class="singer-name"
+                  aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"周杰伦","view_id":"singer_name_1"}'>
+              周杰伦
+            </span>
+          </div>
+          <div class="song-meta">
+            <span class="song-tag">限免</span>
+            <span class="song-tag hd">1080P</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片2：夜曲 -->
+      <div class="song-card"
+           onclick="alert('点击了卡片: 夜曲')">
+        <div class="voice-badge"
+             aria-label='{"operate_type":"click","action_name":"action_general_index","contentDescription":"2","view_id":"badge_2"}'>
+          <span>2</span>
+        </div>
+        <div class="song-info">
+          <div class="song-name"
+               aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"夜曲","view_id":"song_name_2"}'>
+            夜曲
+          </div>
+          <div class="song-singer">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            <span class="singer-name"
+                  aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"周杰伦","view_id":"singer_name_2"}'>
+              周杰伦
+            </span>
+          </div>
+          <div class="song-meta">
+            <span class="song-tag vip">VIP</span>
+            <span class="song-tag hd">1080P</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片3：晴天 -->
+      <div class="song-card"
+           onclick="alert('点击了卡片: 晴天')">
+        <div class="voice-badge"
+             aria-label='{"operate_type":"click","action_name":"action_general_index","contentDescription":"3","view_id":"badge_3"}'>
+          <span>3</span>
+        </div>
+        <div class="song-info">
+          <div class="song-name"
+               aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"晴天","view_id":"song_name_3"}'>
+            晴天
+          </div>
+          <div class="song-singer">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            <span class="singer-name"
+                  aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"周杰伦","view_id":"singer_name_3"}'>
+              周杰伦
+            </span>
+          </div>
+          <div class="song-meta">
+            <span class="song-tag">限免</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片4：稻香 -->
+      <div class="song-card"
+           onclick="alert('点击了卡片: 稻香')">
+        <div class="voice-badge"
+             aria-label='{"operate_type":"click","action_name":"action_general_index","contentDescription":"4","view_id":"badge_4"}'>
+          <span>4</span>
+        </div>
+        <div class="song-info">
+          <div class="song-name"
+               aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"稻香","view_id":"song_name_4"}'>
+            稻香
+          </div>
+          <div class="song-singer">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            <span class="singer-name"
+                  aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"周杰伦","view_id":"singer_name_4"}'>
+              周杰伦
+            </span>
+          </div>
+          <div class="song-meta">
+            <span class="song-tag">限免</span>
+            <span class="song-tag hd">1080P</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片5：七里香 -->
+      <div class="song-card"
+           onclick="alert('点击了卡片: 七里香')">
+        <div class="voice-badge"
+             aria-label='{"operate_type":"click","action_name":"action_general_index","contentDescription":"5","view_id":"badge_5"}'>
+          <span>5</span>
+        </div>
+        <div class="song-info">
+          <div class="song-name"
+               aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"七里香","view_id":"song_name_5"}'>
+            七里香
+          </div>
+          <div class="song-singer">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            <span class="singer-name"
+                  aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"周杰伦","view_id":"singer_name_5"}'>
+              周杰伦
+            </span>
+          </div>
+          <div class="song-meta">
+            <span class="song-tag vip">VIP</span>
+            <span class="song-tag hd">1080P</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片6：青花瓷 -->
+      <div class="song-card"
+           onclick="alert('点击了卡片: 青花瓷')">
+        <div class="voice-badge"
+             aria-label='{"operate_type":"click","action_name":"action_general_index","contentDescription":"6","view_id":"badge_6"}'>
+          <span>6</span>
+        </div>
+        <div class="song-info">
+          <div class="song-name"
+               aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"青花瓷","view_id":"song_name_6"}'>
+            青花瓷
+          </div>
+          <div class="song-singer">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            <span class="singer-name"
+                  aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"周杰伦","view_id":"singer_name_6"}'>
+              周杰伦
+            </span>
+          </div>
+          <div class="song-meta">
+            <span class="song-tag">限免</span>
+            <span class="song-tag hd">1080P</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片7：菊花台 -->
+      <div class="song-card"
+           onclick="alert('点击了卡片: 菊花台')">
+        <div class="voice-badge"
+             aria-label='{"operate_type":"click","action_name":"action_general_index","contentDescription":"7","view_id":"badge_7"}'>
+          <span>7</span>
+        </div>
+        <div class="song-info">
+          <div class="song-name"
+               aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"菊花台","view_id":"song_name_7"}'>
+            菊花台
+          </div>
+          <div class="song-singer">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            <span class="singer-name"
+                  aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"周杰伦","view_id":"singer_name_7"}'>
+              周杰伦
+            </span>
+          </div>
+          <div class="song-meta">
+            <span class="song-tag vip">VIP</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片8：东风破 -->
+      <div class="song-card"
+           onclick="alert('点击了卡片: 东风破')">
+        <div class="voice-badge"
+             aria-label='{"operate_type":"click","action_name":"action_general_index","contentDescription":"8","view_id":"badge_8"}'>
+          <span>8</span>
+        </div>
+        <div class="song-info">
+          <div class="song-name"
+               aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"东风破","view_id":"song_name_8"}'>
+            东风破
+          </div>
+          <div class="song-singer">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            <span class="singer-name"
+                  aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"周杰伦","view_id":"singer_name_8"}'>
+              周杰伦
+            </span>
+          </div>
+          <div class="song-meta">
+            <span class="song-tag">限免</span>
+            <span class="song-tag hd">1080P</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片9：以父之名 -->
+      <div class="song-card"
+           onclick="alert('点击了卡片: 以父之名')">
+        <div class="voice-badge"
+             aria-label='{"operate_type":"click","action_name":"action_general_index","contentDescription":"9","view_id":"badge_9"}'>
+          <span>9</span>
+        </div>
+        <div class="song-info">
+          <div class="song-name"
+               aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"以父之名","view_id":"song_name_9"}'>
+            以父之名
+          </div>
+          <div class="song-singer">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            <span class="singer-name"
+                  aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"周杰伦","view_id":"singer_name_9"}'>
+              周杰伦
+            </span>
+          </div>
+          <div class="song-meta">
+            <span class="song-tag vip">VIP</span>
+            <span class="song-tag hd">1080P</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片10：简单爱 -->
+      <div class="song-card"
+           onclick="alert('点击了卡片: 简单爱')">
+        <div class="voice-badge"
+             aria-label='{"operate_type":"click","action_name":"action_general_index","contentDescription":"10","view_id":"badge_10"}'>
+          <span>10</span>
+        </div>
+        <div class="song-info">
+          <div class="song-name"
+               aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"简单爱","view_id":"song_name_10"}'>
+            简单爱
+          </div>
+          <div class="song-singer">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            <span class="singer-name"
+                  aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"周杰伦","view_id":"singer_name_10"}'>
+              周杰伦
+            </span>
+          </div>
+          <div class="song-meta">
+            <span class="song-tag">限免</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片11：枫 -->
+      <div class="song-card"
+           onclick="alert('点击了卡片: 枫')">
+        <div class="voice-badge"
+             aria-label='{"operate_type":"click","action_name":"action_general_index","contentDescription":"11","view_id":"badge_11"}'>
+          <span>11</span>
+        </div>
+        <div class="song-info">
+          <div class="song-name"
+               aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"枫","view_id":"song_name_11"}'>
+            枫
+          </div>
+          <div class="song-singer">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            <span class="singer-name"
+                  aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"周杰伦","view_id":"singer_name_11"}'>
+              周杰伦
+            </span>
+          </div>
+          <div class="song-meta">
+            <span class="song-tag">限免</span>
+            <span class="song-tag hd">1080P</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片12：彩虹 -->
+      <div class="song-card"
+           onclick="alert('点击了卡片: 彩虹')">
+        <div class="voice-badge"
+             aria-label='{"operate_type":"click","action_name":"action_general_index","contentDescription":"12","view_id":"badge_12"}'>
+          <span>12</span>
+        </div>
+        <div class="song-info">
+          <div class="song-name"
+               aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"彩虹","view_id":"song_name_12"}'>
+            彩虹
+          </div>
+          <div class="song-singer">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            <span class="singer-name"
+                  aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"周杰伦","view_id":"singer_name_12"}'>
+              周杰伦
+            </span>
+          </div>
+          <div class="song-meta">
+            <span class="song-tag vip">VIP</span>
+            <span class="song-tag hd">1080P</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片13：安静 -->
+      <div class="song-card"
+           onclick="alert('点击了卡片: 安静')">
+        <div class="voice-badge"
+             aria-label='{"operate_type":"click","action_name":"action_general_index","contentDescription":"13","view_id":"badge_13"}'>
+          <span>13</span>
+        </div>
+        <div class="song-info">
+          <div class="song-name"
+               aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"安静","view_id":"song_name_13"}'>
+            安静
+          </div>
+          <div class="song-singer">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            <span class="singer-name"
+                  aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"周杰伦","view_id":"singer_name_13"}'>
+              周杰伦
+            </span>
+          </div>
+          <div class="song-meta">
+            <span class="song-tag">限免</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片14：听妈妈的话 -->
+      <div class="song-card"
+           onclick="alert('点击了卡片: 听妈妈的话')">
+        <div class="voice-badge"
+             aria-label='{"operate_type":"click","action_name":"action_general_index","contentDescription":"14","view_id":"badge_14"}'>
+          <span>14</span>
+        </div>
+        <div class="song-info">
+          <div class="song-name"
+               aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"听妈妈的话","view_id":"song_name_14"}'>
+            听妈妈的话
+          </div>
+          <div class="song-singer">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            <span class="singer-name"
+                  aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"周杰伦","view_id":"singer_name_14"}'>
+              周杰伦
+            </span>
+          </div>
+          <div class="song-meta">
+            <span class="song-tag">限免</span>
+            <span class="song-tag hd">1080P</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片15：千里之外 -->
+      <div class="song-card"
+           onclick="alert('点击了卡片: 千里之外')">
+        <div class="voice-badge"
+             aria-label='{"operate_type":"click","action_name":"action_general_index","contentDescription":"15","view_id":"badge_15"}'>
+          <span>15</span>
+        </div>
+        <div class="song-info">
+          <div class="song-name"
+               aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"千里之外","view_id":"song_name_15"}'>
+            千里之外
+          </div>
+          <div class="song-singer">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            <span class="singer-name"
+                  aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"周杰伦","view_id":"singer_name_15"}'>
+              周杰伦
+            </span>
+          </div>
+          <div class="song-meta">
+            <span class="song-tag vip">VIP</span>
+            <span class="song-tag hd">1080P</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片16：蒲公英的约定 -->
+      <div class="song-card"
+           onclick="alert('点击了卡片: 蒲公英的约定')">
+        <div class="voice-badge"
+             aria-label='{"operate_type":"click","action_name":"action_general_index","contentDescription":"16","view_id":"badge_16"}'>
+          <span>16</span>
+        </div>
+        <div class="song-info">
+          <div class="song-name"
+               aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"蒲公英的约定","view_id":"song_name_16"}'>
+            蒲公英的约定
+          </div>
+          <div class="song-singer">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            <span class="singer-name"
+                  aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"周杰伦","view_id":"singer_name_16"}'>
+              周杰伦
+            </span>
+          </div>
+          <div class="song-meta">
+            <span class="song-tag">限免</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片17：黑色幽默 -->
+      <div class="song-card"
+           onclick="alert('点击了卡片: 黑色幽默')">
+        <div class="voice-badge"
+             aria-label='{"operate_type":"click","action_name":"action_general_index","contentDescription":"17","view_id":"badge_17"}'>
+          <span>17</span>
+        </div>
+        <div class="song-info">
+          <div class="song-name"
+               aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"黑色幽默","view_id":"song_name_17"}'>
+            黑色幽默
+          </div>
+          <div class="song-singer">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            <span class="singer-name"
+                  aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"周杰伦","view_id":"singer_name_17"}'>
+              周杰伦
+            </span>
+          </div>
+          <div class="song-meta">
+            <span class="song-tag">限免</span>
+            <span class="song-tag hd">1080P</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片18：我不配 -->
+      <div class="song-card"
+           onclick="alert('点击了卡片: 我不配')">
+        <div class="voice-badge"
+             aria-label='{"operate_type":"click","action_name":"action_general_index","contentDescription":"18","view_id":"badge_18"}'>
+          <span>18</span>
+        </div>
+        <div class="song-info">
+          <div class="song-name"
+               aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"我不配","view_id":"song_name_18"}'>
+            我不配
+          </div>
+          <div class="song-singer">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            <span class="singer-name"
+                  aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"周杰伦","view_id":"singer_name_18"}'>
+              周杰伦
+            </span>
+          </div>
+          <div class="song-meta">
+            <span class="song-tag vip">VIP</span>
+            <span class="song-tag hd">1080P</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片19：龙拳 -->
+      <div class="song-card"
+           onclick="alert('点击了卡片: 龙拳')">
+        <div class="voice-badge"
+             aria-label='{"operate_type":"click","action_name":"action_general_index","contentDescription":"19","view_id":"badge_19"}'>
+          <span>19</span>
+        </div>
+        <div class="song-info">
+          <div class="song-name"
+               aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"龙拳","view_id":"song_name_19"}'>
+            龙拳
+          </div>
+          <div class="song-singer">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            <span class="singer-name"
+                  aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"周杰伦","view_id":"singer_name_19"}'>
+              周杰伦
+            </span>
+          </div>
+          <div class="song-meta">
+            <span class="song-tag">限免</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片20：烟花易冷 -->
+      <div class="song-card"
+           onclick="alert('点击了卡片: 烟花易冷')">
+        <div class="voice-badge"
+             aria-label='{"operate_type":"click","action_name":"action_general_index","contentDescription":"20","view_id":"badge_20"}'>
+          <span>20</span>
+        </div>
+        <div class="song-info">
+          <div class="song-name"
+               aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"烟花易冷","view_id":"song_name_20"}'>
+            烟花易冷
+          </div>
+          <div class="song-singer">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            <span class="singer-name"
+                  aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"周杰伦","view_id":"singer_name_20"}'>
+              周杰伦
+            </span>
+          </div>
+          <div class="song-meta">
+            <span class="song-tag">限免</span>
+            <span class="song-tag hd">1080P</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片21：搁浅 -->
+      <div class="song-card"
+           onclick="alert('点击了卡片: 搁浅')">
+        <div class="voice-badge"
+             aria-label='{"operate_type":"click","action_name":"action_general_index","contentDescription":"21","view_id":"badge_21"}'>
+          <span>21</span>
+        </div>
+        <div class="song-info">
+          <div class="song-name"
+               aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"搁浅","view_id":"song_name_21"}'>
+            搁浅
+          </div>
+          <div class="song-singer">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            <span class="singer-name"
+                  aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"周杰伦","view_id":"singer_name_21"}'>
+              周杰伦
+            </span>
+          </div>
+          <div class="song-meta">
+            <span class="song-tag vip">VIP</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片22：发如雪 -->
+      <div class="song-card"
+           onclick="alert('点击了卡片: 发如雪')">
+        <div class="voice-badge"
+             aria-label='{"operate_type":"click","action_name":"action_general_index","contentDescription":"22","view_id":"badge_22"}'>
+          <span>22</span>
+        </div>
+        <div class="song-info">
+          <div class="song-name"
+               aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"发如雪","view_id":"song_name_22"}'>
+            发如雪
+          </div>
+          <div class="song-singer">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            <span class="singer-name"
+                  aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"周杰伦","view_id":"singer_name_22"}'>
+              周杰伦
+            </span>
+          </div>
+          <div class="song-meta">
+            <span class="song-tag">限免</span>
+            <span class="song-tag hd">1080P</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片23：明明就 -->
+      <div class="song-card"
+           onclick="alert('点击了卡片: 明明就')">
+        <div class="voice-badge"
+             aria-label='{"operate_type":"click","action_name":"action_general_index","contentDescription":"23","view_id":"badge_23"}'>
+          <span>23</span>
+        </div>
+        <div class="song-info">
+          <div class="song-name"
+               aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"明明就","view_id":"song_name_23"}'>
+            明明就
+          </div>
+          <div class="song-singer">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            <span class="singer-name"
+                  aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"周杰伦","view_id":"singer_name_23"}'>
+              周杰伦
+            </span>
+          </div>
+          <div class="song-meta">
+            <span class="song-tag">限免</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片24：反方向的钟 -->
+      <div class="song-card"
+           onclick="alert('点击了卡片: 反方向的钟')">
+        <div class="voice-badge"
+             aria-label='{"operate_type":"click","action_name":"action_general_index","contentDescription":"24","view_id":"badge_24"}'>
+          <span>24</span>
+        </div>
+        <div class="song-info">
+          <div class="song-name"
+               aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"反方向的钟","view_id":"song_name_24"}'>
+            反方向的钟
+          </div>
+          <div class="song-singer">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            <span class="singer-name"
+                  aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"周杰伦","view_id":"singer_name_24"}'>
+              周杰伦
+            </span>
+          </div>
+          <div class="song-meta">
+            <span class="song-tag vip">VIP</span>
+            <span class="song-tag hd">1080P</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片25：世界末日 -->
+      <div class="song-card"
+           onclick="alert('点击了卡片: 世界末日')">
+        <div class="voice-badge"
+             aria-label='{"operate_type":"click","action_name":"action_general_index","contentDescription":"25","view_id":"badge_25"}'>
+          <span>25</span>
+        </div>
+        <div class="song-info">
+          <div class="song-name"
+               aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"世界末日","view_id":"song_name_25"}'>
+            世界末日
+          </div>
+          <div class="song-singer">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            <span class="singer-name"
+                  aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"周杰伦","view_id":"singer_name_25"}'>
+              周杰伦
+            </span>
+          </div>
+          <div class="song-meta">
+            <span class="song-tag">限免</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片26：回到过去 -->
+      <div class="song-card"
+           onclick="alert('点击了卡片: 回到过去')">
+        <div class="voice-badge"
+             aria-label='{"operate_type":"click","action_name":"action_general_index","contentDescription":"26","view_id":"badge_26"}'>
+          <span>26</span>
+        </div>
+        <div class="song-info">
+          <div class="song-name"
+               aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"回到过去","view_id":"song_name_26"}'>
+            回到过去
+          </div>
+          <div class="song-singer">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            <span class="singer-name"
+                  aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"周杰伦","view_id":"singer_name_26"}'>
+              周杰伦
+            </span>
+          </div>
+          <div class="song-meta">
+            <span class="song-tag">限免</span>
+            <span class="song-tag hd">1080P</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片27：爷爷泡的茶 -->
+      <div class="song-card"
+           onclick="alert('点击了卡片: 爷爷泡的茶')">
+        <div class="voice-badge"
+             aria-label='{"operate_type":"click","action_name":"action_general_index","contentDescription":"27","view_id":"badge_27"}'>
+          <span>27</span>
+        </div>
+        <div class="song-info">
+          <div class="song-name"
+               aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"爷爷泡的茶","view_id":"song_name_27"}'>
+            爷爷泡的茶
+          </div>
+          <div class="song-singer">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            <span class="singer-name"
+                  aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"周杰伦","view_id":"singer_name_27"}'>
+              周杰伦
+            </span>
+          </div>
+          <div class="song-meta">
+            <span class="song-tag vip">VIP</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片28：可爱女人 -->
+      <div class="song-card"
+           onclick="alert('点击了卡片: 可爱女人')">
+        <div class="voice-badge"
+             aria-label='{"operate_type":"click","action_name":"action_general_index","contentDescription":"28","view_id":"badge_28"}'>
+          <span>28</span>
+        </div>
+        <div class="song-info">
+          <div class="song-name"
+               aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"可爱女人","view_id":"song_name_28"}'>
+            可爱女人
+          </div>
+          <div class="song-singer">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            <span class="singer-name"
+                  aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"周杰伦","view_id":"singer_name_28"}'>
+              周杰伦
+            </span>
+          </div>
+          <div class="song-meta">
+            <span class="song-tag">限免</span>
+            <span class="song-tag hd">1080P</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片29：园游会 -->
+      <div class="song-card"
+           onclick="alert('点击了卡片: 园游会')">
+        <div class="voice-badge"
+             aria-label='{"operate_type":"click","action_name":"action_general_index","contentDescription":"29","view_id":"badge_29"}'>
+          <span>29</span>
+        </div>
+        <div class="song-info">
+          <div class="song-name"
+               aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"园游会","view_id":"song_name_29"}'>
+            园游会
+          </div>
+          <div class="song-singer">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            <span class="singer-name"
+                  aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"周杰伦","view_id":"singer_name_29"}'>
+              周杰伦
+            </span>
+          </div>
+          <div class="song-meta">
+            <span class="song-tag">限免</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片30：星晴 -->
+      <div class="song-card"
+           onclick="alert('点击了卡片: 星晴')">
+        <div class="voice-badge"
+             aria-label='{"operate_type":"click","action_name":"action_general_index","contentDescription":"30","view_id":"badge_30"}'>
+          <span>30</span>
+        </div>
+        <div class="song-info">
+          <div class="song-name"
+               aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"星晴","view_id":"song_name_30"}'>
+            星晴
+          </div>
+          <div class="song-singer">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            <span class="singer-name"
+                  aria-label='{"operate_type":"click","action_name":"action_general_label","contentDescription":"周杰伦","view_id":"singer_name_30"}'>
+              周杰伦
+            </span>
+          </div>
+          <div class="song-meta">
+            <span class="song-tag vip">VIP</span>
+            <span class="song-tag hd">1080P</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // 最小化脚本 - 仅用于页面通知,不设置无障碍数据
+    window.TSVehicle?.setHomeBottomMargin?.(120);
+    window.TSBaseInfo?.notifyHomePageLoadCompleted?.();
+    window.TSBaseInfo?.notifyHomeDataLoadCompleted?.();
+    
+    console.log('=== 纯HTML无障碍标注示例已加载 ===');
+    console.log('✅ 整个卡片作为一个点击事件');
+    console.log('✅ 角标: action_general_index');
+    console.log('✅ 歌名/歌手: action_general_label');
+    console.log('✅ 子元素数据独立,点击统一');
+    console.log('✅ 不依赖JavaScript设置无障碍数据');
+  </script>
+</body>
+</html>
