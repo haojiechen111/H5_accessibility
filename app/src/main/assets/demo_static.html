@@ -193,9 +193,8 @@
       display: flex;
       overflow-x: auto;
       overflow-y: hidden;
-      gap: 20px;
+      gap: 100px;
       padding: 20px 10px;
-      scroll-snap-type: x mandatory;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: thin;
       scrollbar-color: rgba(255, 255, 255, 0.5) transparent;
@@ -225,7 +224,6 @@
       border-radius: 12px;
       padding: 25px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      scroll-snap-align: start;
       flex-shrink: 0;
       border-left: 4px solid #667eea;
       transition: transform 0.2s ease;
@@ -252,7 +250,7 @@
     }
   </style>
 </head>
-<body aria-label='{"operate_type":"click","action_name":"slide_direction_vertical","contentDescription":"slide_direction_vertical","view_id":"com.best.h5bydcs:id/slide_direction_vertical"}' style="overflow-y: auto;">
+<body class="smooth-scroll" aria-label='{"operate_type":"click","action_name":"slide_direction_vertical","contentDescription":"slide_direction_vertical","view_id":"com.best.h5bydcs:id/slide_direction_vertical"}' style="overflow-y: auto;">
   <div class="container">
     <div class="header">
       <h1>静态HTML无障碍标注示例</h1>
@@ -262,9 +260,9 @@
     <!-- 横向滑动名人名言 -->
     <div class="quotes-section">
       <div class="quotes-title">每日名言</div>
-      <div class="quotes-container"
+      <div class="quotes-container smooth-scroll"
            aria-label='{"operate_type":"click","action_name":"slide_direction_horizontal","contentDescription":"slide_direction_horizontal","view_id":"com.best.h5bydcs:id/slide_direction_horizontal"}'>
-        
+
         <div class="quote-card">
           <div class="quote-text">"成功不是终点，失败也不是末日，重要的是继续前进的勇气。"</div>
           <div class="quote-author">— 温斯顿·丘吉尔</div>
@@ -343,7 +341,7 @@
 
     <!-- 歌曲列表 -->
     <div class="song-list">
-      
+
       <!-- 卡片1：告白气球 -->
       <div class="song-card"
            onclick="alert('点击了卡片: 告白气球')">
@@ -1181,7 +1179,7 @@
     window.TSVehicle?.setHomeBottomMargin?.(120);
     window.TSBaseInfo?.notifyHomePageLoadCompleted?.();
     window.TSBaseInfo?.notifyHomeDataLoadCompleted?.();
-    
+
     console.log('=== 纯HTML无障碍标注示例已加载 ===');
     console.log('✅ 整个卡片作为一个点击事件');
     console.log('✅ 角标: action_general_index');
@@ -1189,5 +1187,8 @@
     console.log('✅ 子元素数据独立,点击统一');
     console.log('✅ 不依赖JavaScript设置无障碍数据');
   </script>
+
+  <!-- 引入通用平滑滚动脚本 -->
+  <script src="smooth-scroll.js"></script>
 </body>
 </html>
