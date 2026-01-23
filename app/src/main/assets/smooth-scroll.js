@@ -17,8 +17,8 @@
   // 配置参数
   var config = {
     duration: 300,          // 动画时长（毫秒）
-    distanceThreshold: 100, // 触发距离（像素）
-    timeThreshold: 100      // 时间间隔（毫秒）
+    distanceThreshold: 400, // 触发距离阈值（像素）- 提高到400px减少误判
+    timeThreshold: 200      // 时间间隔阈值（毫秒）- 提高到200ms减少误判
   };
   
   // 等待DOM加载完成
@@ -75,23 +75,23 @@
       var distanceX = Math.abs(currentScrollLeft - state.lastScrollLeft);
       var distanceY = Math.abs(currentScrollTop - state.lastScrollTop);
       var distance = Math.max(distanceX, distanceY);
-      
+
       // 详细日志：每次滚动都打印
-      console.log('📊 [SmoothScroll]', containerName, '滚动事件:', {
-        scrollLeft: currentScrollLeft,
-        scrollTop: currentScrollTop,
-        lastScrollLeft: state.lastScrollLeft,
-        lastScrollTop: state.lastScrollTop,
-        distanceX: distanceX,
-        distanceY: distanceY,
-        maxDistance: distance,
-        timeDiff: timeDiff,
-        isAnimating: state.isAnimating
-      });
-      
+            console.log('📊 [SmoothScroll]', containerName, '滚动事件:', {
+              scrollLeft: currentScrollLeft,
+              scrollTop: currentScrollTop,
+              lastScrollLeft: state.lastScrollLeft,
+              lastScrollTop: state.lastScrollTop,
+              distanceX: distanceX,
+              distanceY: distanceY,
+              maxDistance: distance,
+              timeDiff: timeDiff,
+              isAnimating: state.isAnimating
+            });
       // 检测是否为语音触发的滚动
       // 特征：滚动距离大 且 时间间隔长 且 不在动画中
-      if (distance > config.distanceThreshold 
+      // 提高阈值减少手势大幅滑动的误判
+      if (distance > config.distanceThreshold
           && timeDiff > config.timeThreshold 
           && !state.isAnimating) {
         
